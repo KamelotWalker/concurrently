@@ -11,6 +11,9 @@ importers:
       chalk:
         specifier: 5.6.2
         version: 5.6.2
+      quiet-kill-tree:
+        specifier: 0.1.1
+        version: 0.1.1
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -20,9 +23,6 @@ importers:
       supports-color:
         specifier: 10.2.2
         version: 10.2.2
-      tree-kill:
-        specifier: 1.2.2
-        version: 1.2.2
       yargs:
         specifier: 18.0.0
         version: 18.0.0
@@ -1094,6 +1094,10 @@ packages:
     resolution: {integrity: sha512-+Owyggi9IxT1ePKGafcI87ubSmxol6smwJ+RAHDQlx9+9cPwFWDiKFFCPuWhr9ignlGpZ9vDQLw67N4dcTVFEA==}
     engines: {node: '>=20'}
 
+  quiet-kill-tree@0.1.1:
+    resolution: {integrity: sha512-QUzLu+8fwoj8badA5tvd12PdkLp0J02MotrHP5f55L9US9tQIqgY0Tv5i35KLtp8lGLkLWnw+og6zTysDNuoyQ==}
+    engines: {node: '>=20'}
+
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -1182,10 +1186,6 @@ packages:
   tinyrainbow@3.2.0:
     resolution: {integrity: sha512-LgO3D9yZJjApUiuUfl9iFAwrtaX4+lok3wJIqttGoKCHlWUqHqbQpnxCf82L8FjgKsh4iGo78hqJwgL8F6To2A==}
     engines: {node: '>=14.0.0'}
-
-  tree-kill@1.2.2:
-    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
-    hasBin: true
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -2214,6 +2214,8 @@ snapshots:
     dependencies:
       hookified: 2.2.0
 
+  quiet-kill-tree@0.1.1: {}
+
   require-directory@2.1.1: {}
 
   rollup@4.64.9:
@@ -2313,8 +2315,6 @@ snapshots:
       picomatch: 4.0.7
 
   tinyrainbow@3.2.0: {}
-
-  tree-kill@1.2.2: {}
 
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:

@@ -35,6 +35,12 @@ The default is `SIGTERM`, but it's also possible to send `SIGKILL`.
 $ concurrently --kill-others --kill-signal SIGKILL 'npm start' 'npm test'
 ```
 
+On Windows, process trees are always terminated forcefully with `taskkill /T /F`;
+the signal is ignored. The default process-tree killer uses `quiet-kill-tree`,
+which keeps helper output private and treats an already-exited process as a no-op,
+without matching localized Windows error messages. Termination remains best-effort:
+command completion is determined by the child process's close event.
+
 ### Timeout
 
 In case you have a misbehaving process that ignores the kill signal, you can force kill it after some

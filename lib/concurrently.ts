@@ -3,7 +3,6 @@ import os from 'node:os';
 import { Writable } from 'node:stream';
 
 import { takeUntil } from 'rxjs';
-import treeKill from 'tree-kill';
 
 import {
     CloseEvent,
@@ -19,6 +18,7 @@ import { ExpandShortcut } from './command-parser/expand-shortcut.js';
 import { ExpandWildcard } from './command-parser/expand-wildcard.js';
 import { CompletionListener, SuccessCondition } from './completion-listener.js';
 import { FlowController } from './flow-control/flow-controller.js';
+import { killProcess } from './kill-process.js';
 import { Logger } from './logger.js';
 import { OutputWriter } from './output-writer.js';
 import { PrefixColorSelector } from './prefix-color-selector.js';
@@ -27,7 +27,7 @@ import { castArray } from './utils.js';
 
 const defaults: ConcurrentlyOptions = {
     spawn: createSpawn(),
-    kill: treeKill,
+    kill: killProcess,
     raw: false,
     controllers: [],
     cwd: undefined,
@@ -139,7 +139,7 @@ export interface ConcurrentlyOptions {
 
     /**
      * A function that will kill processes.
-     * Defaults to the `tree-kill` module.
+     * Defaults to `quiet-kill-tree` (fire-and-forget).
      */
     kill: KillProcess;
 

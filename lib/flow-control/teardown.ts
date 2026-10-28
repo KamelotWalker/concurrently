@@ -1,9 +1,9 @@
 import EventEmitter from 'node:events';
 
 import Rx from 'rxjs';
-import treeKill from 'tree-kill';
 
 import { Command, KillProcess, SpawnCommand } from '../command.js';
+import { killProcess } from '../kill-process.js';
 import { Logger } from '../logger.js';
 import { getSpawnOpts } from '../spawn.js';
 import { FlowController } from './flow-controller.js';
@@ -22,7 +22,7 @@ export class Teardown implements FlowController {
         spawn,
         commands,
         process = globalThis.process,
-        kill = treeKill,
+        kill = killProcess,
     }: {
         logger: Logger;
         /**
@@ -35,7 +35,7 @@ export class Teardown implements FlowController {
          */
         process?: EventEmitter;
         /**
-         * How to send a signal to a running teardown command. Defaults to `tree-kill`.
+         * How to send a signal to a running teardown command. Defaults to `quiet-kill-tree`.
          */
         kill?: KillProcess;
     }) {
