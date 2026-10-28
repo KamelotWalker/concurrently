@@ -1,32 +1,35 @@
-import { killTree } from 'quiet-kill-tree';
+import type * as QuietKillTree from 'quiet-kill-tree';
+import { killTree, KillTreeError } from 'quiet-kill-tree';
 import { beforeEach, expect, it, vi } from 'vitest';
 
 import { killProcess } from './kill-process.js';
 
-vi.mock('quiet-kill-tree', () => ({ killTree: vi.fn() }));
+vi.mock('quiet-kill-tree', async (importOriginal) => ({
+    ...(await importOriginal<typeof QuietKillTree>()),
+    killTree: vi.fn(),
+}));
 
 beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(killTree).mockResolvedValue({ pid: 123, killed: true });
 });
 
-it('passes the pid and signal to the promise-based killer', async () => {
-    vi.mocked(killTree).mockResolvedValue({ pid: 123, killed: true });
-    await expect(killProcess(123, 'SIGINT')).resolves.toBeUndefined();
-    expect(killTree).toHaveBeenCalledExactlyOnceWith(123, {
-        signal: process.platform === 'win32' ? undefined : 'SIGINT',
-    });
+it.runIf(process.platform !== 'win32')(
+    'forwards the requested POSIX signal unchanged',
+    async () => {
+        await killProcess(123, 'SIGINT');
+        expect(killTree).toHaveBeenCalledExactlyOnceWith(123, { signal: 'SIGINT' });
+    },
+);
+
+it.runIf(process.platform === 'win32')('ignores the requested signal on Windows', async () => {
+    await killProcess(123, 'invalid');
+    expect(killTree).toHaveBeenCalledExactlyOnceWith(123, { signal: undefined });
 });
 
 it('leaves the default signal to the killer', async () => {
     await killProcess(123);
     expect(killTree).toHaveBeenCalledExactlyOnceWith(123, { signal: undefined });
-});
-
-it('preserves case-insensitive signals', async () => {
-    await killProcess(123, 'sigterm');
-    expect(killTree).toHaveBeenCalledExactlyOnceWith(123, {
-        signal: process.platform === 'win32' ? undefined : 'SIGTERM',
-    });
 });
 
 it.each(['not-found', 'already-exited'] as const)(
@@ -37,14 +40,21 @@ it.each(['not-found', 'already-exited'] as const)(
     },
 );
 
-it('preserves best-effort behavior for asynchronous failures', async () => {
-    vi.mocked(killTree).mockRejectedValue(new Error('access denied'));
+it('preserves best-effort behavior for asynchronous OS failures', async () => {
+    vi.mocked(killTree).mockRejectedValue(new KillTreeError('EACCES', 123, 'access denied'));
     await expect(killProcess(123)).resolves.toBeUndefined();
 });
 
-it('preserves best-effort behavior for synchronous failures', async () => {
+it('does not suppress unexpected promise failures', async () => {
+    const error = new TypeError('unexpected validation failure');
+    vi.mocked(killTree).mockRejectedValue(error);
+    await expect(killProcess(123)).rejects.toBe(error);
+});
+
+it('surfaces synchronous validation errors synchronously', () => {
+    const error = new TypeError('invalid signal');
     vi.mocked(killTree).mockImplementation(() => {
-        throw new TypeError('invalid signal');
+        throw error;
     });
-    await expect(killProcess(123, 'invalid')).resolves.toBeUndefined();
+    expect(() => killProcess(123, 'invalid')).toThrow(error);
 });
